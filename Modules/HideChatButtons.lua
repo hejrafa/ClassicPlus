@@ -47,10 +47,7 @@ local chatButtons = {
 local socialButtons = {
     "QuickJoinToastButton", -- Social toast button
     "ChatSocialButton", -- Social button in chat frame
-    "SocialButton", -- Alternative social button name
-    "FriendsMicroButton", -- Friends list button
-    "SocialsMicroButton", -- Social micro button
-    "FriendsFrameMicroButton"
+    "FriendsMicroButton", -- Social (O) button near chat
 }
 
 -- Chat minimize and other buttons
@@ -100,19 +97,10 @@ local function ApplyTransparency(alpha)
     
     -- Try specific known button names to avoid dynamic search errors
     local additionalButtons = {
-        -- Additional social buttons
         "QuickJoinToastButton1",
         "ChatSocialMenuButton",
-        "SocialMenuButton",
-        "FriendsFrameMicroButton",
-        "SocialMicroButton",
-        
-        -- Additional arrow buttons and variations
-        "ChatFrameUpButton1",
-        "ChatFrameDownButton1",
-        "ChatFrameBottomButton1",
     }
-    
+
     SetGroupAlpha(additionalButtons, alpha)
 end
 

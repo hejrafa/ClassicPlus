@@ -45,6 +45,8 @@ end
 local function RestoreStanceBar()
     if ClassicPlusDB and ClassicPlusDB.hideStanceBarEnabled then return end
     if InCombatLockdown() then return end
+    -- Don't force-show stance bars for classes with no stances (mage, etc.)
+    if GetNumShapeshiftForms() == 0 then return end
 
     for _, name in ipairs(STANCE_BAR_FRAMES) do
         local frame = _G[name]

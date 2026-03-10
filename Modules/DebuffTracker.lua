@@ -21,6 +21,7 @@ local IMPORTANT_DEBUFFS = {
     ["Polymorph"] = true,
     ["Frost Nova"] = true,
     ["Frostbite"] = true,
+    ["Invisibility"] = true,
     -- Rogue
     ["Kidney Shot"] = true,
     ["Cheap Shot"] = true,
