@@ -1,5 +1,5 @@
 --[[ ClassicPlus - DebuffTracker ]]
--- Displays important debuffs/CC on Nameplates and replaces Target Portrait.
+-- Displays important debuffs/CC on Nameplates and replaces Target/Party Portraits.
 
 local addonName, ns = ...
 
@@ -148,11 +148,27 @@ local function GetUnitFrameForPortrait(unit)
     if unit == "player" and PlayerFrame then return PlayerFrame end
     if unit == "target" and TargetFrame then return TargetFrame end
     if unit == "focus" and _G.FocusFrame then return _G.FocusFrame end
+    local partyIndex = unit:match("^party(%d)$")
+    if partyIndex then
+        local frame = _G["PartyMemberFrame" .. partyIndex]
+        if frame then return frame end
+    end
+    return nil
+end
+
+local function GetPortraitForUnit(unit)
+    if unit == "player" then return PlayerPortrait end
+    if unit == "target" then return TargetFramePortrait end
+    if unit == "focus" then return _G.FocusFramePortrait or (_G.FocusFrame and _G.FocusFrame.portrait) end
+    local partyIndex = unit:match("^party(%d)$")
+    if partyIndex then
+        return _G["PartyMemberFrame" .. partyIndex .. "Portrait"]
+    end
     return nil
 end
 
 local function UpdateUnitPortraitDebuff(unit)
-    local portrait = (unit == "player") and PlayerPortrait or (unit == "target") and TargetFramePortrait or (unit == "focus") and (_G.FocusFramePortrait or (_G.FocusFrame and _G.FocusFrame.portrait))
+    local portrait = GetPortraitForUnit(unit)
     local unitFrame = GetUnitFrameForPortrait(unit)
 
     -- If setting is off or unit doesn't exist, reset to default portrait
@@ -329,11 +345,20 @@ end
 -- Event Handling
 -- =========================
 
+local PARTY_UNITS = { "party1", "party2", "party3", "party4" }
+
+local function UpdateAllPartyPortraits()
+    for _, partyUnit in ipairs(PARTY_UNITS) do
+        UpdateUnitPortraitDebuff(partyUnit)
+    end
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
 frame:RegisterEvent("UNIT_AURA")
 frame:RegisterEvent("PLAYER_TARGET_CHANGED")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("GROUP_ROSTER_UPDATE")
 
 frame:SetScript("OnEvent", function(self, event, unit)
     if event == "NAME_PLATE_UNIT_ADDED" then
@@ -345,15 +370,21 @@ frame:SetScript("OnEvent", function(self, event, unit)
         if unit == "target" or unit == "player" then
             UpdateUnitPortraitDebuff(unit)
         end
+        if unit and unit:match("^party%d$") then
+            UpdateUnitPortraitDebuff(unit)
+        end
         local plate = C_NamePlate.GetNamePlateForUnit(unit)
         if plate and plate.UnitFrame then
             OnNameplateUpdate(plate.UnitFrame)
         end
     elseif event == "PLAYER_TARGET_CHANGED" then
         UpdateUnitPortraitDebuff("target")
+    elseif event == "GROUP_ROSTER_UPDATE" then
+        UpdateAllPartyPortraits()
     elseif event == "PLAYER_ENTERING_WORLD" then
         UpdateUnitPortraitDebuff("player")
         UpdateUnitPortraitDebuff("target")
+        UpdateAllPartyPortraits()
         -- Apply Blizzard aura row layering once at load (aura row on top)
         RaiseBlizzardAuraFrameLevels(TargetFrame)
         if _G.FocusFrame then RaiseBlizzardAuraFrameLevels(_G.FocusFrame) end

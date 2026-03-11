@@ -1322,13 +1322,15 @@ local function ChatFilterImpl(self, event, msg, author, ...)
         return false, SpaceBeforeX(prefixMinus .. "Auction cancelled: |r" .. ColorWhite .. cleanItem .. "|r"), author, ...
     end
 
-    -- 5. Arena Points
+    -- 5. Arena Points (message may contain color codes / item links, e.g. "|cff...|Hcurrency:1901|h[Arena Points]|h|r x580.")
     if (event == "CHAT_MSG_SYSTEM" or event == "CHAT_MSG_CURRENCY") and type(msg) == "string" and msg:find("Arena Points") then
+        -- Strip all WoW escape sequences (color codes, hyperlinks, brackets) for a clean match
+        local clean = msg:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|H.-|h", ""):gsub("[%[%]]", "")
         local arenaPoints =
-            msg:match("You receive currency:%s*Arena Points x(%d+)[%p%s]*$") or
-            msg:match("You receive currency:%s*Arena Points%s*(%d+)[%p%s]*$") or
-            msg:match("Arena Points x(%d+)[%p%s]*$") or
-            msg:match("(%d+)%s*[Aa]rena%s+[Pp]oints")
+            clean:match("You receive currency:%s*Arena Points%s*x(%d+)") or
+            clean:match("You receive currency:%s*Arena Points%s+(%d+)") or
+            clean:match("Arena Points%s*x(%d+)") or
+            clean:match("(%d+)%s*[Aa]rena%s+[Pp]oints")
 
         if arenaPoints then
             return false, SpaceBeforeX(prefixPlus .. ColorWhite .. "Arena Points: |r" .. ColorPurple .. arenaPoints .. "|r"), author, ...
