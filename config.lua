@@ -678,7 +678,7 @@ footerCredit:SetText(LightGrey .. "Created by Rafa - " .. "|cff00aaffhejrafa.com
 
 local footerVersion = content:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 footerVersion:SetPoint("TOPRIGHT", content, "TOPRIGHT", -20, yPos)
-footerVersion:SetText(LightGrey .. "v1.3.2|r")
+footerVersion:SetText(LightGrey .. "v1.3.4|r")
 
 -- Match sidebar: footer ends with same bottom spacing as "Requires UI reload" (SIDE_GAP)
 local FOOTER_LINE_HEIGHT = 14

@@ -1323,7 +1323,7 @@ local function ChatFilterImpl(self, event, msg, author, ...)
     end
 
     -- 5. Arena Points
-    if event == "CHAT_MSG_SYSTEM" and type(msg) == "string" and msg:find("Arena Points") then
+    if (event == "CHAT_MSG_SYSTEM" or event == "CHAT_MSG_CURRENCY") and type(msg) == "string" and msg:find("Arena Points") then
         local arenaPoints =
             msg:match("You receive currency:%s*Arena Points x(%d+)[%p%s]*$") or
             msg:match("You receive currency:%s*Arena Points%s*(%d+)[%p%s]*$") or
@@ -2088,6 +2088,7 @@ local function RegisterChatFilters()
         "CHAT_MSG_AUCTION_OUTBIDDED",
         "CHAT_MSG_AUCTION_EXPIRED",
         "CHAT_MSG_AUCTION_CANCELLED",
+        "CHAT_MSG_CURRENCY",
         -- Monster emotes (sanitize stray % format sequences before Blizzard formats them)
         "CHAT_MSG_MONSTER_EMOTE",
         -- Standard Chat Events for Bracket Removal
